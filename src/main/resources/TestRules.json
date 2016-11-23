@@ -23,7 +23,7 @@
         {"say":"it was false"},
         {"state":"VerifyOrder"},
         {"transfer":"This is the transfer message"},
-        {"class":"com.staples.chatbot.poc.TestAction"}
+        {"class":"com.quintana.try2.TestAction"}
       ]
     },
     {
