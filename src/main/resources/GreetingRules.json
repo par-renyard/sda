@@ -1,0 +1,51 @@
+
+{
+  "name": "GreetingState",
+  "description":"The set of rules for the initial state of the bot.  checks to see if it's an intent we 'care about'.  If not sends to agent",
+  "rules": [
+    {
+      "name": "Default Send to Agent","scope": "default",
+      "check": [
+        {"script":"true"}
+      ],
+      "true": [
+        {"say":"default action was true"},
+        {"transfer":"This is the transfer message"}
+      ]
+    },
+    {
+      "name": "Greeting intent","scope": "Intent",
+      "check": [
+        {"intents":["Greeting"],"confidences":[0.75]},
+        {"script":"context.greetedCt<1"}
+      ],
+      "true": [
+        {"say":"Hi this is the staples chatbot.  I can help you with  order tracking"},
+        {"script":"context.greetedCt++"}
+      ]
+    },
+    {
+      "name": "Ignorable Intents","scope": "Intent",
+      "check": [
+        {"intents":["Affirmative","Wait","Greeting","Acknowledgement"],"confidence":0.90},
+        {"script":"context.tryCt<2"}
+      ],
+      "true": [
+        {"script":"context.tryCt++"}
+      ]
+    },
+    {
+      "name": "Shipment Tracking Check","scope": "Intent",
+      "check": [
+        {"intent":"ShipmentTracking","confidence":0.85}
+      ],
+      "true": [
+        {"say":"Great, I can help you track your order."},
+        {"state":"CaptureOrder"}
+      ]
+    }
+
+  ]
+}
+
+

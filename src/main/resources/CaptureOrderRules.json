@@ -1,0 +1,86 @@
+
+{
+  "name": "CaptureOrderState",
+  "description":"Set of rules for capturing the order number",
+  "rules": [
+    {
+      "name": "Give entry messaging","scope": "entry",
+      "check": [
+        {"script":"context.entry_ct==1"}
+      ],
+      "true": [
+        {"say":"To get started, I am going to need your order number and zip."},
+        {"say":"Can I please have your order number?"}
+      ]
+    },
+    {
+      "name": "Give re-entry messaging","scope": "entry",
+      "check": [
+        {"script":"context.entry_ct==2"}
+      ],
+      "true": [
+        {"say":"Ok, let's try that again."},
+        {"say":"Can I please have your order number?"}
+      ]
+    },
+    {
+      "name": "Give up, transfer","scope": "entry",
+      "check": [
+        {"script":"context.entry_ct>2"}
+      ],
+      "true": [
+        {"transfer": "Let me transfer you to the next available agent"}
+      ]
+    },
+    {
+      "name": "Default Send to Agent","scope": "default",
+      "check": [
+        {"script":"context.tryCt>=2"}
+      ],
+      "true": [
+        {"say":"default action was true"},
+        {"transfer":"This is the transfer message"}
+      ],
+      "false": [
+        {"script":"context.tryCt++"},
+        {"say":"I'm sorry I didn't understand."},
+        {"say":"Can I please have your order number?"}
+      ]
+    },
+    {
+      "name": "Extract Order Number",
+      "scope": "Intent",
+      "class": "com.staples.chatbot.poc.ExtractOrderNumRule"
+    },
+    {
+      "name": "Ignorable Intents","scope": "Intent",
+      "check": [
+        {"intents":["Affirmative","Wait","Greeting","Acknowledgement"],"confidence":0.90},
+        {"script":"context.tryCt<2"}
+      ],
+      "true": [
+        {"script":"context.tryCt++"}
+      ]
+    },
+    {
+      "name": "Negative goes to Agent","scope": "Intent",
+      "check": [
+        {"intent":"Negative","confidence":0.85}
+      ],
+      "true": [
+        {"transfer":"I'll connect you with the next available agent."}
+      ]
+    },
+    {
+      "name": "Customer asked for Agent","scope": "Intent",
+      "check": [
+        {"intent":"AgentTransfer","confidence":0.85}
+      ],
+      "true": [
+        {"transfer":"I'll connect you with the next available agent."}
+      ]
+    }
+  ]
+}
+
+

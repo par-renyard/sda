@@ -1,0 +1,49 @@
+
+{
+  "name": "VerifyOrderState",
+  "description":"Simple rules to verify the order number.",
+  "rules": [
+    {
+      "name": "Ask if order number is correct","scope": "entry",
+      "check": [
+        {"script":"true"}
+      ],
+      "true": [
+        {"say":"Is that correct?"}
+      ]
+    },
+    {
+      "name": "Re-try or send to agent","scope": "default",
+      "check": [
+        {"script":"context.tryCnt>=1"}
+      ],
+      "true": [
+        {"state":"CaptureOrder"}
+      ],
+      "false": [
+        {"say":"I'm sorry.  Do I have your correct order number?"},
+        {"script":"context.tryCnt++"}
+      ]
+    },
+    {
+      "name": "Negative Intent","scope": "Intent",
+      "check": [
+        {"intents":["Negative"],"confidences":[0.85]}
+      ],
+      "true": [
+        {"state":"CaptureOrder"}
+      ]
+    },
+    {
+      "name": "Affirmative Intent","scope": "Intent",
+      "check": [
+        {"intents":["Affirmative"],"confidences":[0.85]}
+      ],
+      "true": [
+        {"say":"Great, I have your order!"}
+      ]
+    }
+  ]
+}
+
+
