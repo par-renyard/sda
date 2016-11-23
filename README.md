@@ -3,12 +3,12 @@ poc project for chatbot rules and logic
 
 This PoC attempts to validate some of the basic rules required for executing the staples WiMS chat flows.
 
-Little to not time spend on acutal Channel or Message interfaces.  Most of work was around testing rules impl.
+Little to no time spend on actual Channel or Message interfaces.  Most of work was around testing rules impl.
 
 Quickstart:  Run ConversationClient
 
 Design/PoC goals:
-- demonstrate simple state machine which can accomidate a real world conversation flow
+- demonstrate simple state machine which can accommodate a real world conversation flow
 - create a configurable rules mechanism
 - rules checks should be configurable via file (json) or java
 - rule actions also should also be configurable via json
@@ -23,7 +23,7 @@ The core main class is:  ConversationClient
 - run this class and talk to the bot.
 - current rules demonstrate a basic conversation flow of three states:
 - Greeting:
-    figure out if its  a valid intent
+    figure out if its a valid intent
     transfer to agent or continue if "good" intent
 - CaptureOrder:
     pull 10 digit order number out of customer message
@@ -70,12 +70,13 @@ Action:
 
     A rule can also be an action.  So you can nest rule execution.
 
-    Custom actions are also possible in java.  more on this below in configraiton.
+    Custom actions are also possible in java.  more on this below in configraiton.  An example of this is implemented
+    to capture the order number using RE.
 
 ==================================
 Configuration:
 ==================================
-- Rules and actions are configured via a simple Json syntax.  for example:
+- Rules and actions are configured via a simple Json syntax.  for example this is a rule:
 
     {
       "name": "Test Rule 2","scope": "Intent",
@@ -95,12 +96,12 @@ Configuration:
       ]
     }
 
-- The above rule configuraiton has 2 checks.  It checks that the intent is ShipmenTracking or Greeting at the specified confidence
+- The above rule configuration has 2 checks.  It checks that the intent is ShipmenTracking or Greeting at the specified confidence
 - It also checks that the "tryCount" is less than one.
 - if both conditions are met, the actions listed under "true" are executed
 - if the rule tests false the actions under "false" are executed.
 
-- The True configuraiton demostrates all 4 possible action configs:
+- The True configuration demonstrates all 4 possible action configs:
 - "say": "it was true" will pass the corresponding message back to the channel.  This should be modifiied to message keys rather than text.
 - "transfer": "this is a message" will say the message and then transfer on the channel to an agent.
 - "state": "NewState" updates the state of the machine. Rules are organized into states, so this basically changes the ruleset
@@ -123,8 +124,20 @@ State Classes:
 - entry count on each state
 - ....
 
-- ConversationState is what currently holds the rules. A naming convention around conversaiton rules and config json is imposed.
+- ConversationState is what currently holds the rules. A naming convention around conversation rules and config json is imposed.
 State: StateName, then json file:  StateNameRules.json must exist
+
+- Rules also fall into 1 of three "scopes"
+- Scope = "Entry"
+    entry rules are executed when you first enter into the conversation state
+    no utternace from the user is required.
+    these rules are executed each time you enter the state
+- Scope="Intent"
+    these rules are executed every time an utterance is relieved from the user.
+    Watson is used to find intent, then each intent rule is executed
+- Scope="Default"
+    this concept could be removed.  currently when an utterance is recieved, if none of the intent rules match, then the defaul rules are executed
+    this could also be accomplised with the rules config itself
 
 
 This Poc code represents 2-3 hours on 2 weekend days.  It was meant to prove out basic flow and concepts required.
