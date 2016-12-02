@@ -1,11 +1,13 @@
 package com.staples;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.mail.search.FlagTerm;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import com.edlio.emailreplyparser.Email;
 import com.edlio.emailreplyparser.EmailParser;
 import com.edlio.emailreplyparser.EmailReplyParser;
@@ -39,32 +41,39 @@ public class EmailIntentParser {
 
      /*  Get the messages which is unread in the Inbox*/
         Message messages[] = inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
-        String content = "";
+
+        CSVWriter writer = new CSVWriter(new FileWriter("output.csv"), ',');
+        String[] entries = "From#Sent time#Subject#Reply text#Intent#Confidence#Tone".split("#");
+        writer.writeNext(entries);
+
         for (int i = 0; i < messages.length; i++) {
-            System.out.println("Message " + (i + 1) + " - Content Type:" + messages[i].getContentType());
+            System.out.println("Message " + (i + 1));
 
             String emailTxt = ep.getTextFromMessage(messages[i]);
-            System.out.println(emailTxt);
 
-
-            Email email = EmailReplyParser.read(emailTxt);
-            System.out.println("-----------------------------------------------------------------------------");
-            System.out.println("Just the reply for " + (i + 1) + " - Content Type:" + messages[i].getContentType());
             String reply = EmailReplyParser.parseReply(emailTxt);
 
-            System.out.println(reply);
-            System.out.println("-----------------------------------------------------------------------------");
+            reply = reply.replaceAll("[\\t\\n\\r]+"," ");
 
+            if(reply != null && reply.length() > 0){
+                IntentResponse response = client.getIntent(reply);
 
-            IntentResponse response = client.getIntent(reply);
+                System.out.println("Input: " + response.getInputText());
+                System.out.println("Intent: " + response.getIntent());
+                System.out.println("Confidence: " + response.getConfidence());
 
-            System.out.println("Input: " + response.getInputText());
-            System.out.println("Intent: " + response.getIntent());
-            System.out.println("Confidence: " + response.getConfidence());
+                String[] input = "FromS-E-P-A-R-A-T-O-RSent timeS-E-P-A-R-A-T-O-RSubject$S-E-P-A-R-A-T-O-RReply textS-E-P-A-R-A-T-O-RIntentS-E-P-A-R-A-T-O-RConfidenceS-E-P-A-R-A-T-O-RTone"
+                        .replace("From", messages[i].getFrom()[0].toString())
+                        .replace("Sent time", messages[i].getSentDate().toString())
+                        .replace("Subject", messages[i].getSubject())
+                        .replace("Reply text", reply)
+                        .replace("Intent", response.getIntent().toString())
+                        .replace("Confidence", response.getConfidence() + "")
+                        .split("S-E-P-A-R-A-T-O-R");
 
-            System.out.println("-----------------------------------------------------------------------------");
-            System.out.println("-----------------------------------------------------------------------------");
-            System.out.println();
+                writer.writeNext(input);
+            }
+
 
             if (i == 10)
                 break;
@@ -72,6 +81,7 @@ public class EmailIntentParser {
         }
         inbox.close(false);
         store.close();
+        writer.close();
 
     }
 
