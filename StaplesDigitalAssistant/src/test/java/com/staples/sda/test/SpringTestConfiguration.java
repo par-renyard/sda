@@ -13,6 +13,7 @@ import org.springframework.context.support.SimpleThreadScope;
 
 import com.staples.sda.dialog.channel.OutputChannel;
 import com.staples.sda.dialog.message.AbstractMessage;
+import com.staples.sda.dialog.message.MessageContext;
 
 @Configuration
 @ComponentScan("com.staples.sda")
@@ -40,6 +41,17 @@ public class SpringTestConfiguration {
 			@Override
 			public void outputMessage(AbstractMessage message) {
 				System.out.println(message.getRaw());
+			}
+
+			@Override
+			public void transferToAgent(MessageContext lastMessage) {
+				
+			}
+
+			@Override
+			public void terminate(MessageContext lastMessage) {
+				// TODO Auto-generated method stub
+				
 			}
 		};
 	}

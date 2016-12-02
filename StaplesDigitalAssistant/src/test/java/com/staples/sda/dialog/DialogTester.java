@@ -35,6 +35,9 @@ public class DialogTester {
 	@Autowired
 	private StateMachine<States, Intents> stateMachine;
 	
+	@Autowired
+	private ExtendedStateHelper extendedStateHelper;
+	
 	Logger log = LoggerFactory.getLogger(getClass());
 
 	@Test
@@ -78,9 +81,9 @@ public class DialogTester {
 		StandardMessage inbound = StandardMessage.builder().inbound(inboundMessage).conversationId(inboundId).build();
 		
 		List<Intent> intents = new ArrayList<Intent>();
-		intents.add(new Intent(intent, intent.name(), Intent.CONFIDENCE_MAX));
+		intents.add(new Intent(intent, intent.name(), Intent.CONFIDENCE_MAX, ""));
 		MessageContext mc = new MessageContext(inbound, intents, new ArrayList<Entity>());
-		ExtendedStateHelper.setLastMessage(stateMachine.getExtendedState(), mc);
+		extendedStateHelper.accessor().setLastMessage(mc);
 		return MessageBuilder.withPayload(mc.getHighestConfidenceIntent().getCode()).setHeader(MessageHeaderHelper.MessageHeaders.MESSAGE_CONTEXT.getHeaderName(), mc).build();
 	}
 	
@@ -88,11 +91,11 @@ public class DialogTester {
 		StandardMessage inbound = StandardMessage.builder().inbound(inboundMessage).conversationId(inboundId).build();
 		
 		List<Intent> intents = new ArrayList<Intent>();
-		intents.add(new Intent(intent, intent.name(), Intent.CONFIDENCE_MAX));
+		intents.add(new Intent(intent, intent.name(), Intent.CONFIDENCE_MAX, ""));
 		List<Entity> entities = new ArrayList<Entity>();
 		entities.add(new Entity("test", entity));
 		MessageContext mc = new MessageContext(inbound, intents, entities);
-		ExtendedStateHelper.setLastMessage(stateMachine.getExtendedState(), mc);
+		extendedStateHelper.accessor().setLastMessage(mc);
 		return MessageBuilder.withPayload(mc.getHighestConfidenceIntent().getCode()).setHeader(MessageHeaderHelper.MessageHeaders.MESSAGE_CONTEXT.getHeaderName(), mc).build();
 	}
 
