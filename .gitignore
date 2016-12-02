@@ -1,4 +1,5 @@
 .idea/
 emailparserpoc/target/
-
+.DS_Store
+emailparserpoc/.DS_Store
 *iml
