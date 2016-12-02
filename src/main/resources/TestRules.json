@@ -1,0 +1,43 @@
+
+{
+  "name": "TestState",
+  "description":"This is an initial test state that has all the check and action types...",
+  "rules": [
+    {
+      "name": "Test Rule 1","scope": "Intent",
+      "check": [
+        {"intent":"ShipmentTracking","confidence":0.85},
+        {"script":"context.tryCount<1"}
+      ],
+      "true": [
+        {"say":"it was true"},
+        {"rule":
+          {"name":"TestTry count","scope":"rule",
+          "check":[{"script":"context.tryCount>1"}],
+          "true":[{"transfer":"let me get you ove"}],
+          "false":[{"script":"context.tryCount++"}]
+          }
+        }
+      ],
+      "false": [
+        {"say":"it was false"},
+        {"state":"VerifyOrder"},
+        {"transfer":"This is the transfer message"},
+        {"class":"com.quintana.try2.TestAction"}
+      ]
+    },
+    {
+      "name": "Test Rule 2","scope": "Intent",
+      "check": [
+        {"intents":["ShipmentTracking","Greeting"],"confidences":[0.85,0.85]}
+      ],
+      "true": [
+        {"say":"it was true"}
+      ],
+      "false": [
+        {"say":"it was false"}
+      ]
+    }
+
+  ]
+}
