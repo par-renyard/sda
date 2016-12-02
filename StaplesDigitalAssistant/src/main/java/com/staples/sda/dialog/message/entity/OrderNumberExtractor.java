@@ -8,6 +8,6 @@ import com.staples.sda.dialog.Entities;
 public class OrderNumberExtractor extends AbstractRegexExtractor implements EntityExtractor {
 
 	public OrderNumberExtractor() {
-		super("\\s([\\d]{10})\\s", Entities.ORDER_NUM);
+		super("([\\d]{10})", Entities.ORDER_NUM);
 	}
 }

@@ -1,50 +1,44 @@
 package com.staples.sda.statemachine;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.ExtendedState;
+import org.springframework.stereotype.Service;
 
-import com.staples.sda.dialog.message.MessageContext;
-
+@Service
 public class ExtendedStateHelper {
 	
-	public static enum Variables {
-		
-		AWAITING_ENITITY("sda.variable.awaiting_entity", Boolean.class),
-		LAST_MESSAGE("sda.variable.last_message", MessageContext.class);
-		
-		private String variableName;
-		private Class<?> type;
-		
-		private <T> Variables(String variableName, Class<T> type) {
-			this.variableName = variableName;
-			this.type = type;
-		}
-		public String getVariableName() {
-			return this.variableName;
-		}
-		public Class<?> getType() {
-			return type;
+	@Autowired
+	private StateMachineWrapper stateMachineWrapper;
+	
+	public ExtendedStateAccessor accessor() {
+		if (stateMachineWrapper.isReady()) {
+			return ExtendedStateAccessor.forState(stateMachineWrapper.getExtendedState());
+		} else {
+			return ExtendedStateAccessor.forState(new DummyExtendedState());
 		}
 	}
 	
-	public static Object getVariable(ExtendedState extendedState, Variables variable) {
-		return extendedState.get(variable.getVariableName(), variable.getType());
-	}
-	public static void setVariable(ExtendedState extendedState, Variables variable, Object value) {
-		extendedState.getVariables().put(variable.getVariableName(), value);
+	private static class DummyExtendedState implements ExtendedState {
+
+		@Override
+		public Map<Object, Object> getVariables() {
+			return new HashMap<Object, Object>();
+		}
+
+		@Override
+		public <T> T get(Object key, Class<T> type) {
+			return null;
+		}
+
+		@Override
+		public void setExtendedStateChangeListener(ExtendedStateChangeListener listener) {
+		}
+		
 	}
 	
-	public static boolean isAwaitingEntity(ExtendedState extendedState) {
-		Object awaiting = getVariable(extendedState, Variables.AWAITING_ENITITY);
-		return awaiting != null && (Boolean) awaiting;
-	}
-	public static void setAwaitingEntity(ExtendedState extendedState, boolean yesNo) {
-		setVariable(extendedState, Variables.AWAITING_ENITITY, Boolean.valueOf(yesNo));
-	}
-	public static void setLastMessage(ExtendedState extendedState, MessageContext mc) {
-		setVariable(extendedState, Variables.LAST_MESSAGE, mc);
-	}
-	public static MessageContext getLastMessage(ExtendedState extendedState) {
-		return (MessageContext) getVariable(extendedState, Variables.LAST_MESSAGE);
-	}
+
 
 }

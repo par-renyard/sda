@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import com.staples.sda.dialog.Entities;
 import com.staples.sda.dialog.message.AbstractMessage;
 
-public class AbstractRegexExtractor {
+public abstract class AbstractRegexExtractor implements EntityExtractor {
 	private Pattern p = null;
 	private Entities type = null;
 	

@@ -10,6 +10,8 @@ public class MessageContext {
 	private AbstractMessage message;
 	private List<Intent> intents;
 	private List<Entity> entities;
+	private long createTime;
+	
 	public AbstractMessage getMessage() {
 		return message;
 	}
@@ -28,11 +30,15 @@ public class MessageContext {
 	public void setEntities(List<Entity> entities) {
 		this.entities = entities;
 	}
+	public long getCreateTime() {
+		return this.createTime;
+	}
 	public MessageContext(AbstractMessage message, List<Intent> intents, List<Entity> entities) {
 		super();
 		this.message = message;
 		this.intents = intents;
 		this.entities = entities;
+		this.createTime = System.currentTimeMillis();
 	}
 	
 	public Intent getHighestConfidenceIntent() {

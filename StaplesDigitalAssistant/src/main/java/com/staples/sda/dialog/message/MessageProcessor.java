@@ -2,6 +2,8 @@ package com.staples.sda.dialog.message;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
@@ -15,13 +17,18 @@ import com.staples.sda.dialog.message.intent.Intent;
 import com.staples.sda.dialog.message.intent.IntentAnalyzer;
 import com.staples.sda.statemachine.ExtendedStateHelper;
 import com.staples.sda.statemachine.MessageHeaderHelper;
-
+import com.staples.sda.statemachine.StateMachineWrapper;
 
 @Service
 public class MessageProcessor {
 	
+	private Logger log = LoggerFactory.getLogger(MessageProcessor.class);
+	
 	@Autowired
-	private StateMachine<States, Intents> stateMachine;
+	private StateMachineWrapper stateMachineWrapper;
+	
+	@Autowired
+	private ExtendedStateHelper extendedStateHelper;
 	
 	@Autowired
 	private IntentAnalyzer intentAnalyzer;
@@ -34,10 +41,11 @@ public class MessageProcessor {
 		List<Entity> entities = entityAnalyzer.analyze(message);
 		
 		if (entities.size() > 0) {
-			intents.add(new Intent(Intents.ENTITY_PROVIDED, "entityProvided", 1.0d));
+			intents.add(new Intent(Intents.ENTITY_PROVIDED, "entityProvided", 1.0d, ""));
 		}			
 		MessageContext mc = new MessageContext(message, intents, entities);
-		ExtendedStateHelper.setLastMessage(stateMachine.getExtendedState(), mc);
-		stateMachine.sendEvent(MessageBuilder.withPayload(mc.getHighestConfidenceIntent().getCode()).setHeader(MessageHeaderHelper.MessageHeaders.MESSAGE_CONTEXT.getHeaderName(), mc).build());
+		extendedStateHelper.accessor().setLastMessage(mc);
+		log.debug("Received message [{}], Thread [{}]", message.getRaw(), Thread.currentThread().getId());
+		stateMachineWrapper.getStateMachine().sendEvent(MessageBuilder.withPayload(mc.getHighestConfidenceIntent().getCode()).setHeader(MessageHeaderHelper.MessageHeaders.MESSAGE_CONTEXT.getHeaderName(), mc).build());
 	}
 }

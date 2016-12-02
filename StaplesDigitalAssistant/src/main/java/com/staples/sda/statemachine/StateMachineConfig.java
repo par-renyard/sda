@@ -4,8 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
@@ -18,7 +16,6 @@ import com.staples.sda.dialog.States;
 
 @Configuration
 @EnableStateMachine
-@Scope(value="session", proxyMode=ScopedProxyMode.TARGET_CLASS)
 public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States, Intents> {
 	
 	private Logger log = LoggerFactory.getLogger(StateMachineConfig.class);
@@ -27,23 +24,24 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
 	private StateMachineGuardConfig stateMachineGuardConfig;
 	
 	@Autowired
-	private StateMachineListenerBean stateMachineListenerBean;
+	private StateMachineActions stateMachineTimerActions;
 	
 	
 	@Override
 	public void configure(StateMachineConfigurationConfigurer<States, Intents> config) throws Exception {
 		config
 			.withConfiguration()
-				.autoStartup(true)
-				.listener(stateMachineListenerBean);
+				.autoStartup(true);
 	}
 
 	@Override
 	public void configure(StateMachineStateConfigurer<States, Intents> states) throws Exception {
+		log.debug("Configuring states");
         states
         .withStates()
             .initial(States.WAIT_FOR_INTENT)
             .state(States.WIMS)
+            .state(States.WAIT_FOR_INTENT)
             .and()
             .withStates()
             	.parent(States.WIMS)
@@ -56,10 +54,16 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
 
 	@Override
 	public void configure(StateMachineTransitionConfigurer<States, Intents> transitions) throws Exception {
+		log.debug("Configuring transitionss");
         transitions
         .withExternal()
             .source(States.WAIT_FOR_INTENT).event(Intents.WIMS).target(States.WIMS)
             .and()
+        .withInternal()
+        	.source(States.WIMS)
+        	.action(stateMachineTimerActions.remindTimerAction())
+        	.timer(60000)
+        	.and()
         .withExternal()
             .source(States.REQUEST_ORDER_NUM).event(Intents.ENTITY_PROVIDED).target(States.REQUEST_ZIP)
             .guard(stateMachineGuardConfig.requiresEntityGuard(Entities.ORDER_NUM))
@@ -73,6 +77,7 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
 	    	.and()
 	    .withExternal()
 	    	.source(States.ORDER_LOOKUP).event(Intents.OP_SUCCESS).target(States.ORDER_FOUND);
+        
 	}
 	
 }
