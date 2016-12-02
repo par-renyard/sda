@@ -24,7 +24,7 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
 	private StateMachineGuardConfig stateMachineGuardConfig;
 	
 	@Autowired
-	private StateMachineActions stateMachineTimerActions;
+	private StateMachineActions stateMachineActions;
 	
 	
 	@Override
@@ -39,9 +39,10 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
 		log.debug("Configuring states");
         states
         .withStates()
-            .initial(States.WAIT_FOR_INTENT)
-            .state(States.WIMS)
+            .initial(States.INIT)
             .state(States.WAIT_FOR_INTENT)
+            .state(States.WIMS)
+            .end(States.END)
             .and()
             .withStates()
             	.parent(States.WIMS)
@@ -50,6 +51,7 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
             	.state(States.REQUEST_ZIP)
             	.state(States.ORDER_LOOKUP)
             	.state(States.ORDER_FOUND);
+        	
 	}
 
 	@Override
@@ -57,17 +59,32 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
 		log.debug("Configuring transitionss");
         transitions
         .withExternal()
+        	.source(States.INIT).event(Intents.INIT).target(States.WAIT_FOR_INTENT)
+        	.and()
+        .withExternal()
             .source(States.WAIT_FOR_INTENT).event(Intents.WIMS).target(States.WIMS)
             .and()
         .withInternal()
+        	.source(States.WAIT_FOR_INTENT).event(Intents.NONE)
+        	.action(stateMachineActions.intentResponseAction(Intents.NONE))
+        	.and()
+        .withInternal()
         	.source(States.WIMS)
-        	.action(stateMachineTimerActions.remindTimerAction())
+        	.action(stateMachineActions.remindTimerAction())
         	.timer(60000)
         	.and()
         .withExternal()
             .source(States.REQUEST_ORDER_NUM).event(Intents.ENTITY_PROVIDED).target(States.REQUEST_ZIP)
             .guard(stateMachineGuardConfig.requiresEntityGuard(Entities.ORDER_NUM))
             .and()
+        .withExternal()
+        	.source(States.REQUEST_ORDER_NUM).event(Intents.DONT_HAVE_ORDER_NO).target(States.END)
+        	.action(stateMachineActions.agentAction())
+        	.and()
+        .withExternal()
+        	.source(States.REQUEST_ORDER_NUM).event(Intents.NO).target(States.END)
+        	.action(stateMachineActions.agentAction())
+        	.and()
         .withExternal()
         	.source(States.REQUEST_ZIP).event(Intents.ENTITY_PROVIDED).target(States.ORDER_LOOKUP)
         	.guard(stateMachineGuardConfig.requiresEntityGuard(Entities.ZIP))

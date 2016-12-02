@@ -1,5 +1,6 @@
 package com.staples.sda.dialog.message;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.staples.sda.dialog.Entities;
@@ -38,6 +39,17 @@ public class MessageContext {
 		this.message = message;
 		this.intents = intents;
 		this.entities = entities;
+		this.createTime = System.currentTimeMillis();
+	}
+	
+	public MessageContext(AbstractMessage message, Intent intent) {
+		super();
+		this.message = message;
+		this.intents = new ArrayList<Intent>();
+		if (intent != null) {
+			this.intents.add(intent);
+		}
+		this.entities = new ArrayList<Entity>();
 		this.createTime = System.currentTimeMillis();
 	}
 	

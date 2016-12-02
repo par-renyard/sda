@@ -4,12 +4,10 @@ import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanCurrentlyInCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.statemachine.StateContext;
-import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Service;
 
 import com.staples.sda.dialog.Intents;
@@ -18,8 +16,6 @@ import com.staples.sda.dialog.channel.OutputChannel;
 import com.staples.sda.dialog.message.MessageContext;
 import com.staples.sda.dialog.message.StandardMessage;
 import com.staples.sda.statemachine.ExtendedStateAccessor;
-import com.staples.sda.statemachine.ExtendedStateHelper;
-import com.staples.sda.statemachine.StateMachineWrapper;
 
 @Service
 public class ResourceBundleMessageService implements MessageService {

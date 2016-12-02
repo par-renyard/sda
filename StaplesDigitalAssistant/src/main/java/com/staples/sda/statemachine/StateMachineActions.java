@@ -64,5 +64,31 @@ public class StateMachineActions {
 			}
 		};
 	}
+	public Action<States, Intents> terminateAction() {
+		return new Action<States, Intents>() {
+
+			@Override
+			public void execute(StateContext<States, Intents> context) {
+				MessageContext mc = ExtendedStateAccessor.forContext(context).getLastMessage();
+				if (mc != null) {
+					messageService.sendIntentResponse(context, Intents.TERMINATE, "response");
+					outputChannel.terminate(mc);
+				}
+			}
+		};		
+	}
+	
+	public Action<States, Intents> intentResponseAction(Intents code) {
+		return new Action<States, Intents>() {
+			
+			private Intents intent = code;
+
+			@Override
+			public void execute(StateContext<States, Intents> context) {
+				messageService.sendIntentResponse(context, intent, "response");
+				
+			}
+		};
+	}
 	
 }

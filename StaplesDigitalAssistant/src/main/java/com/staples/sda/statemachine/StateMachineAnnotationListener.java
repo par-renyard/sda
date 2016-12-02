@@ -9,13 +9,13 @@ import org.springframework.statemachine.annotation.OnStateEntry;
 import org.springframework.statemachine.annotation.OnTransitionStart;
 import org.springframework.statemachine.annotation.WithStateMachine;
 import org.springframework.statemachine.state.State;
-import org.springframework.statemachine.transition.TransitionKind;
 import org.springframework.stereotype.Component;
 
 import com.staples.sda.dialog.Intents;
 import com.staples.sda.dialog.States;
 import com.staples.sda.dialog.channel.OutputChannel;
 import com.staples.sda.service.MessageService;
+import com.staples.sda.service.SettingsService;
 
 @WithStateMachine
 @Component
@@ -28,6 +28,9 @@ public class StateMachineAnnotationListener {
 	
 	@Autowired
 	private OutputChannel outputChannel;
+	
+	@Autowired
+	private SettingsService settingsService;
 
 	@OnEventNotAccepted
 	public void onEventNotAccepted(StateContext<States, Intents> context) {
@@ -35,15 +38,31 @@ public class StateMachineAnnotationListener {
 		log.debug("EventNotAccepted [{}] for StateMachine [{}], Thread [{}, Current state [{}], Substate [{}], isSubmachineState [{}], Composite [{}], Orthoogonal [{}], Simple [{}]", context.getEvent(), context.getStateMachine().getUuid(), Thread.currentThread().getId(), context.getSource().getId(), StateMachineUtils.getLowestSubstate(context.getSource()).getId(), context.getSource().isSubmachineState(), context.getSource().isComposite(), context.getSource().isOrthogonal(), context.getSource().isSimple());
 		ExtendedStateAccessor extendedStateAccessor = ExtendedStateAccessor.forState(context.getExtendedState());
 		
-		int noopCounter = extendedStateAccessor.getNoopCounter();
-		messageService.sendIntentResponse(context, context.getMessage().getPayload(), "response");
+		if (extendedStateAccessor.isAwaitingEntity()) {
+			// dialog is actively waiting for user to input an entity (like order number)
+			int noopCounter = extendedStateAccessor.getNoopCounter();
+			int noopMaxCount = settingsService.getValue("not-found.max-count", StateMachineUtils.getLowestSubstate(context.getSource()), Integer.class);
+			
+			if (++noopCounter >= noopMaxCount) {
+				if (settingsService.isAgentAction("not-found.max-count.agent", StateMachineUtils.getLowestSubstate(context.getSource()))) {
+					messageService.sendIntentResponse(context, Intents.AGENT, "response");
+					outputChannel.transferToAgent(extendedStateAccessor.getLastMessage());
+				} else {
+					messageService.sendIntentResponse(context, Intents.TERMINATE, "response");
+					outputChannel.terminate(extendedStateAccessor.getLastMessage());
+					
+				}
+			} else {
+				messageService.sendDialogMessage(context, StateMachineUtils.getLowestSubstate(context.getSource()).getId(), "not-found");
+				extendedStateAccessor.increaseNoopCounter();
+			}
+		} else {
+			messageService.sendIntentResponse(context, context.getMessage().getPayload(), "response");
+		}
+		
 		if (context.getMessage().getPayload() == Intents.AGENT) {
 			outputChannel.transferToAgent(extendedStateAccessor.getLastMessage());
 		}
-		if (extendedStateAccessor.isAwaitingEntity()) {
-			// dialog is waiting for user to input an entity (like order number)
-			messageService.sendDialogMessage(context, StateMachineUtils.getLowestSubstate(context.getSource()).getId(), "not-found");
-		}		
 	}
 	
 	@OnStateEntry

@@ -30,5 +30,9 @@ public class Intent {
 		this.confidence = confidence;
 		this.inputText = inputText;
 	}
+	public String getInputText() {
+		return inputText;
+	}
+
 
 }

@@ -17,18 +17,14 @@
 package com.staples.sda;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
@@ -38,7 +34,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.context.support.SimpleThreadScope;
 
 import com.staples.sda.dialog.channel.OutputChannel;
 import com.staples.sda.dialog.message.AbstractMessage;
@@ -65,6 +60,7 @@ public class SDAConsoleClient implements CommandLineRunner {
 		BufferedReader rdr = new BufferedReader(new InputStreamReader(in, Charset.defaultCharset()));
 		String input = null;
 		String conversationId = "A1";
+		messageProcessor.initialize(conversationId);
 		while ((input = rdr.readLine()) != null) {
 			System.out.println("[USER @" + conversationId + "] " + input);
 			StandardMessage message = StandardMessage.builder().inbound(input).conversationId(conversationId).build();

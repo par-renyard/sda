@@ -1,6 +1,5 @@
 package com.staples.sda.dialog.message.intent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -32,7 +31,7 @@ public class IntentAnalyzer {
 			@Override
 			public boolean test(Intent t) {
 				if (t.getConfidence() < CONFIDENCE_THRESHOLD) {
-					log.debug("Intent [{}] removed, below threshold [{}<{}]", t.getCode(), t.getConfidence(), CONFIDENCE_THRESHOLD);
+					log.debug("Intent [{} ({})] supressed, below threshold [{} < {}]", t.getCode(), t.getExternalCode(), t.getConfidence(), CONFIDENCE_THRESHOLD);
 					return true;
 				}
 				return false;
