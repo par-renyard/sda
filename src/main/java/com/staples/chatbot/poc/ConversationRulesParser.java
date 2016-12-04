@@ -63,18 +63,18 @@ public class ConversationRulesParser {
 
         }
 
-        System.out.println(json.get("name"));
+        Log.debug(json.get("name") + "");
 
         ArrayNode rulesJson = (ArrayNode) json.get("rules");
 
         ConversationRules rules = new ConversationRules();
 
         for(JsonNode ruleJson:rulesJson){
-            System.out.println(ruleJson);
+            Log.debug(ruleJson + "");
             String scope = ruleJson.get("scope").asText();
             Rule rule = parseRule(ruleJson);
 
-            System.out.println("scope: "+scope);
+            Log.debug("scope: "+scope);
 
             if("intent".equalsIgnoreCase(scope)){
                 rules.addIntentRule(rule);

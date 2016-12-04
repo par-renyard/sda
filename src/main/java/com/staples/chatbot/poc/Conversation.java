@@ -49,6 +49,7 @@ public class Conversation {
         addState(new ConversationState("HaveValidOrder",this));
         addState(new ConversationState("LookupOrderNum",this));
         addState(new ConversationState("AnythingElse",this));
+        addState(new ConversationState("VerifyWiMS",this));
 
 //
 //        addState(new CaptureOrderState("CaptureOrder",this));

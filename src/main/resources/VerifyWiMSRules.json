@@ -1,0 +1,45 @@
+{
+  "name": "VerifyOrderState",
+  "description":"Simple rules to verify your intent.",
+  "rules": [
+    {
+      "name": "Ask if this is what you want","scope": "entry",
+      "check": [
+        {"script":"true"}
+      ],
+      "true": [
+        {"say":"This is the staples chatbot. I can help you track your order."},
+        {"say":"Would you like me to track a package for you?"}
+      ]
+    },
+    {
+      "name": "Re-try or send to agent","scope": "default",
+      "check": [
+        {"script":"true"}
+      ],
+      "true": [
+        {"transfer":"Let me get you to an agent."}
+      ]
+    },
+    {
+      "name": "Negative Intent","scope": "Intent",
+      "check": [
+        {"intents":["Negative"],"confidences":[0.85]}
+      ],
+      "true": [
+        {"transfer":"Let me get you to an agent."}
+      ]
+    },
+    {
+      "name": "Affirmative Intent","scope": "Intent",
+      "check": [
+        {"intents":["Affirmative"],"confidences":[0.85]}
+      ],
+      "true": [
+        {"state":"CaptureOrder"}
+      ]
+    }
+  ]
+}
+
+

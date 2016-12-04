@@ -19,8 +19,8 @@
         {"script":"context.greetedCt<1"}
       ],
       "true": [
-        {"say":"Hi this is the staples digital assistant.  I can help you with you track your orders!"},
-        {"script":"context.greetedCt++"}
+        {"script":"context.greetedCt++"},
+        {"state":"VerifyWiMS"}
       ]
     },
     {
@@ -42,7 +42,17 @@
         {"say":"Great, I can help you track your order."},
         {"state":"CaptureOrder"}
       ]
+    },
+    {
+      "name": "Shipment Tracking Check","scope": "Intent",
+      "check": [
+        {"intents":["WiMS_TrackingNumber","WiMS_CarrierRequest","WiMS_DeliveryLocation","WiMS_DeliveryTime","WiMS_General","WiMS_Signature"],"confidence":0.50}
+      ],
+      "true": [
+        {"state":"VerifyWiMS"}
+      ]
     }
+
 
   ]
 }
