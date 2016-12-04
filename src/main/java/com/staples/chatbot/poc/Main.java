@@ -1,5 +1,10 @@
 package com.staples.chatbot.poc;
 
+import com.staples.chatbot.domain.WrappedTrackingResponse;
+import com.staples.chatbot.provider.IPackageTrackingProvider;
+import com.staples.chatbot.provider.ProviderFactory;
+import com.staples.chatbot.provider.domain.PackageTrackingResponse;
+
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -15,15 +20,25 @@ public class Main {
     static Map<String,Integer> cases = new HashMap<String,Integer>();
 
     public static void main(String[] args) throws ScriptException, NoSuchMethodException, IOException {
+        IPackageTrackingProvider provider = ProviderFactory.getInstance().getProvider(IPackageTrackingProvider.class);
+
+        PackageTrackingResponse resp = provider.trackPackages(9747269430L);
+
+        WrappedTrackingResponse wrapper = new WrappedTrackingResponse(resp);
+
+        System.out.println(wrapper.getState());
+
+        nashorn(wrapper);
+
     }
 
-    public static void main4(String[] args) throws ScriptException, NoSuchMethodException {
+    public static void nashorn(WrappedTrackingResponse wrapper) throws ScriptException, NoSuchMethodException {
 
 //        String script =
 //        "var fun1 = function(context) { print('Hi there from Javascript, ' + context); return context.count>2&&context.foo==='baasdr';};";
 
         String script =
-                "var fun1 = function(context) { print('Hi there from Javascript, ' + context); context.foo='baasdr';context.bar++};";
+                "var fun1 = function(context) { print(context.order.state); print('Hi there from Javascript, ' + context.order.stateCd); context.foo='baasdr';context.bar++};";
 
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
         engine.eval(script);
@@ -32,6 +47,7 @@ public class Main {
         context.put("now",new Date());
         context.put("count",3);
         context.put("foo","bar");
+        context.put("order",wrapper);
 
         Invocable invocable = (Invocable) engine;
 

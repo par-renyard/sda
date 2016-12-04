@@ -21,7 +21,8 @@ public class ConsoleClient {
         boolean started = false;
 
         while(loop){
-            System.out.print("Enter String:  ");
+            System.out.print("Your chat  :  ");
+//            System.out.print("Enter String:  ");
             String s = br.readLine();
 
             onMessage(s);
@@ -61,4 +62,9 @@ public class ConsoleClient {
         System.exit(0);
     }
 
+    public void terminate(){
+        this.loop=false;
+        System.out.println("****** Done with Chat *******");
+        System.exit(0);
+    }
 }

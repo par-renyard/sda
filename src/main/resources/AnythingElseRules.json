@@ -1,0 +1,37 @@
+
+{
+  "name": "AnythingElseState",
+  "description":"Simple rules to see if human is done chatting.",
+  "rules": [
+    {
+      "name": "Ask if order you need anything else","scope": "entry",
+      "check": [
+        {"script":"true"}
+      ],
+      "true": [
+        {"say":"Is there anything else I can help you with?"}
+      ]
+    },
+    {
+      "name": "Negative Intent","scope": "Intent",
+      "check": [
+        {"intents":["Negative"],"confidences":[0.85]}
+      ],
+      "true": [
+        {"say":"Great, thanks for chatting with the staples chatbot!"},
+        {"class":"com.staples.chatbot.poc.TerminateChatAction"}
+      ]
+    },
+    {
+      "name": "Any other utterance goes to agent","scope": "default",
+      "check": [
+        {"script":"true"}
+      ],
+      "true": [
+        {"transfer":"Let me connect you with the next available agent"}
+      ]
+    }
+  ]
+}
+
+

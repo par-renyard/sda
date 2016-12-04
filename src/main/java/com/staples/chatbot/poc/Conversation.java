@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class Conversation {
 
-    private static final Logger Log = LoggerFactory.getLogger(IntentClient.class);
+    private static final Logger Log = LoggerFactory.getLogger(Conversation.class);
 
     Map<String,ConversationState> states = new HashMap<>();
 
@@ -46,6 +46,9 @@ public class Conversation {
         addState(new ConversationState("CaptureOrder",this));
         addState(new ConversationState("VerifyOrder",this));
         addState(new ConversationState("CaptureZip",this));
+        addState(new ConversationState("HaveValidOrder",this));
+        addState(new ConversationState("LookupOrderNum",this));
+        addState(new ConversationState("AnythingElse",this));
 
 //
 //        addState(new CaptureOrderState("CaptureOrder",this));

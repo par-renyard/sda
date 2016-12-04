@@ -43,7 +43,7 @@ public class ExtractZipRule extends Rule {
                 state.getChannel().sendMessage("Great I have your order number as "+state.getConversation().getContext().get("orderNumber")
                 +" and zip code as "+state.getConversation().getContext().get("zip"));
 
-                state.getConversation().changeState("VerifyOrder");
+                state.getConversation().changeState("LookupOrderNum");
             }
         });
 

@@ -1,0 +1,43 @@
+
+{
+  "name": "LookupOrderNumState",
+  "description":"Short list of rules to call the order lookup api",
+  "rules": [
+    {
+      "name": "Give entry messaging","scope": "entry",
+      "check": [
+        {"script":"context.entry_ct<3"}
+      ],
+      "true": [
+        {"say":"Just a second while I lookup your order..."},
+        {"rule":
+          {
+            "name": "Extract Order Number",
+            "scope": "Intent",
+            "class": "com.staples.chatbot.poc.LookupOrderNumRule"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Give up, transfer","scope": "entry",
+      "check": [
+        {"script":"context.entry_ct>=3"}
+      ],
+      "true": [
+        {"transfer": "Let me transfer you to the next available agent"}
+      ]
+    },
+    {
+      "name": "Customer asked for Agent","scope": "Intent",
+      "check": [
+        {"intent":"AgentTransfer","confidence":0.85}
+      ],
+      "true": [
+        {"transfer":"I'll connect you with the next available agent."}
+      ]
+    }
+  ]
+}
+
+

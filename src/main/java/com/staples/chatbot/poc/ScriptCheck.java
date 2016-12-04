@@ -34,7 +34,9 @@ public class ScriptCheck implements Check {
         Log.debug("Attempting to execute script [{}]",script);
 
         try {
-            Object result = invocable.invokeFunction("checkIt", state.getContext().asMap());
+            Object result = invocable.invokeFunction("checkIt",
+                    state.getContext().asMap(),
+                    state.getConversation().getContext().asMap());
             if(result==null){
                 Log.warn("Weird the script returned null!");
                 return false;
@@ -55,7 +57,7 @@ public class ScriptCheck implements Check {
 
         try {
             String js =
-                    "var checkIt = function(context) { return "+ script +"};";
+                    "var checkIt = function(context,gcontext) { return "+ script +"};";
 
             ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
             engine.eval(js);

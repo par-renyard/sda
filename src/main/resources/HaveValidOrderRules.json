@@ -1,0 +1,50 @@
+
+{
+  "name": "HaveValidOrderState",
+  "description":"Short list of rules to give some messaging based on API response",
+  "rules": [
+    {
+      "name": "Make sure you have an order in context","scope": "entry",
+      "check": [
+        {"script":"!!gcontext.order"}
+      ],
+      "false": [
+        {"transfer": "Let me transfer you to the next available agent"}
+      ]
+    },
+    {
+      "name": "Not valid order status","scope": "entry",
+      "check": [
+        {"script":"gcontext.order.stateCd=='Other'"}
+      ],
+      "true": [
+        {"transfer": "Let me transfer you to the next available agent"}
+      ],
+      "false": [
+        {"class": "com.staples.chatbot.poc.DescribeOrderStatusAction"}
+      ]
+    },
+    {
+      "name": "Not valid order status","scope": "entry",
+      "check": [
+        {"script":"gcontext.order.stateCd=='Other'"}
+      ],
+      "true": [
+        {"transfer": "Let me transfer you to the next available agent"}
+      ]
+    }
+
+  ,
+    {
+      "name": "Give up, transfer","scope": "entry",
+      "check": [
+        {"script":"context.entry_ct>=3"}
+      ],
+      "true": [
+        {"transfer": "Let me transfer you to the next available agent"}
+      ]
+    }
+  ]
+}
+
+
