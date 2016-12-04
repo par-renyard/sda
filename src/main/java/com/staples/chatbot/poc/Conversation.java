@@ -45,6 +45,8 @@ public class Conversation {
         addState(new ConversationState("Greeting",this));
         addState(new ConversationState("CaptureOrder",this));
         addState(new ConversationState("VerifyOrder",this));
+        addState(new ConversationState("CaptureZip",this));
+
 //
 //        addState(new CaptureOrderState("CaptureOrder",this));
 //        addState(new VerifyOrderNumberState("VerifyOrder",this));

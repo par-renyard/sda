@@ -9,8 +9,7 @@
         {"script":"true"}
       ],
       "true": [
-        {"say":"default action was true"},
-        {"transfer":"This is the transfer message"}
+        {"transfer":"Let me get you to the next available associate."}
       ]
     },
     {
@@ -20,7 +19,7 @@
         {"script":"context.greetedCt<1"}
       ],
       "true": [
-        {"say":"Hi this is the staples chatbot.  I can help you with  order tracking"},
+        {"say":"Hi this is the staples digital assistant.  I can help you with you track your orders!"},
         {"script":"context.greetedCt++"}
       ]
     },
@@ -37,7 +36,7 @@
     {
       "name": "Shipment Tracking Check","scope": "Intent",
       "check": [
-        {"intent":"ShipmentTracking","confidence":0.85}
+        {"intents":["WiMS_TrackingNumber","WiMS_CarrierRequest","WiMS_DeliveryLocation","WiMS_DeliveryTime","WiMS_General","WiMS_Signature"],"confidence":0.85}
       ],
       "true": [
         {"say":"Great, I can help you track your order."},

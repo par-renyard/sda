@@ -2,6 +2,7 @@ package com.staples.chatbot;
 
 /**
  * Created by benquintana on 11/17/16.
+ *
  */
 public enum Intent {
 
@@ -27,7 +28,6 @@ public enum Intent {
     PasswordReset,
     WiMS_TrackingNumber,
     OffTopic
-    ;
     ;
 
 }

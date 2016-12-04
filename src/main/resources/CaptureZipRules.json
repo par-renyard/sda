@@ -1,0 +1,84 @@
+
+{
+  "name": "CaptureZipState",
+  "description":"Set of rules for capturing the zip code",
+  "rules": [
+    {
+      "name": "Give entry messaging","scope": "entry",
+      "check": [
+        {"script":"context.entry_ct==1"}
+      ],
+      "true": [
+        {"say":"Can I please have your delivery zip code?"}
+      ]
+    },
+    {
+      "name": "Give re-entry messaging","scope": "entry",
+      "check": [
+        {"script":"context.entry_ct==2"}
+      ],
+      "true": [
+        {"say":"Ok, let's try that again."},
+        {"say":"Can I please have delivery zip code?"}
+      ]
+    },
+    {
+      "name": "Give up, transfer","scope": "entry",
+      "check": [
+        {"script":"context.entry_ct>2"}
+      ],
+      "true": [
+        {"transfer": "Let me transfer you to the next available agent"}
+      ]
+    },
+    {
+      "name": "Didn't match any expected intents","scope": "default",
+      "check": [
+        {"script":"context.tryCt>=2"}
+      ],
+      "true": [
+        {"transfer":"Let me get you to the next available agent."}
+      ],
+      "false": [
+        {"script":"context.tryCt++"},
+        {"say":"I'm sorry I didn't understand."},
+        {"say":"Can I please have your delivery zip code?"}
+      ]
+    },
+    {
+      "name": "Extract Order Zip",
+      "scope": "Intent",
+      "class": "com.staples.chatbot.poc.ExtractZipRule"
+    },
+    {
+      "name": "Ignorable Intents","scope": "Intent",
+      "check": [
+        {"intents":["Affirmative","Wait","Greeting","Acknowledgement"],"confidence":0.90},
+        {"script":"context.tryCt<2"}
+      ],
+      "true": [
+        {"script":"context.tryCt++"}
+      ]
+    },
+    {
+      "name": "Negative goes to Agent","scope": "Intent",
+      "check": [
+        {"intent":"Negative","confidence":0.85}
+      ],
+      "true": [
+        {"transfer":"I'll connect you with the next available agent."}
+      ]
+    },
+    {
+      "name": "Customer asked for Agent","scope": "Intent",
+      "check": [
+        {"intent":"AgentTransfer","confidence":0.85}
+      ],
+      "true": [
+        {"transfer":"I'll connect you with the next available agent."}
+      ]
+    }
+  ]
+}
+
+

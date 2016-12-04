@@ -40,7 +40,7 @@
         {"intents":["Affirmative"],"confidences":[0.85]}
       ],
       "true": [
-        {"say":"Great, I have your order!"}
+        {"state":"CaptureZip"}
       ]
     }
   ]
